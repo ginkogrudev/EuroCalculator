@@ -1,0 +1,38 @@
+name: EuroCalculator
+description: Лесен калулатор с който да превръщаш лева в евро за всекидневните ти сметки и разплащания.
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  shared_preferences: ^2.5.4
+  provider: ^6.1.5+1   # Make sure this is here
+  url_launcher: ^6.3.0
+  share_plus: ^12.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+# This section must stay at the very edge (no spaces before it)
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/app_icon.png"
+  adaptive_icon_background: "#1A237E"
+  adaptive_icon_foreground: "assets/icon/app_icon.png"
+
+flutter:
+  uses-material-design: true
+  
+  # Ensure your icon folder is listed here so Flutter can find the image!
+  assets:
+    - assets/icon/
