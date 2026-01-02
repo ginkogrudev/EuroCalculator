@@ -6,7 +6,9 @@
 *.swp
 .buildlog/
 .history
-
+/build/
+.dart_tool/
+.packages
 
 
 # Flutter repo-specific
