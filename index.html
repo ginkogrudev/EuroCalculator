@@ -31,8 +31,57 @@
 
     <title>Piggy Calculator</title>
     <link rel="manifest" href="manifest.json" />
+    <style>
+      body {
+        background-color: #121212; /* Matches your dark branding */
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        width: 100vw;
+        color: #FF69B4; /* Your Pink Logo Color */
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .logo {
+        width: 120px;
+        height: 120px;
+        margin-bottom: 20px;
+        animation: pulse 2s infinite ease-in-out;
+      }
+      @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.8; }
+        50% { transform: scale(1.1); opacity: 1; }
+        100% { transform: scale(1); opacity: 0.8; }
+      }
+    </style>
   </head>
   <body>
+    <script>
+      // This listener waits for the Flutter engine to be ready
+      window.addEventListener('load', function() {
+        var loadingIndicator = document.getElementById('loading_indicator');
+        
+        // This is the new way to handle the bootstrap process
+        _flutter.loader.load({
+          onEntrypointLoaded: async function(engineInitializer) {
+            const appRunner = await engineInitializer.initializeEngine();
+            
+            // Remove the piggy loader just as the app starts
+            if (loadingIndicator) {
+              loadingIndicator.remove();
+            }
+            
+            await appRunner.runApp();
+          }
+        });
+      });
+    </script>
     <script src="flutter_bootstrap.js" async></script>
   </body>
 </html>
