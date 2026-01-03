@@ -34,7 +34,7 @@ jobs:
 
       # 3. Build Web Version
       - name: Build Web
-        run: flutter build web --release --base-href "/euro-calculator-demo/"
+        run: flutter build web --release --base-href "/EuroCalculator/"
 
       # 4. Deploy to gh-pages branch (Nukes the 5000 files and replaces with clean build)
       - name: Deploy to GitHub Pages
