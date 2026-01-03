@@ -44,7 +44,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web
           publish_branch: gh-pages
-          force_modify: true # This forces the branch to match the build folder exactly
+          force_orphan: true # This forces the branch to match the build folder exactly
 
       # 5. Create GitHub Release and Upload APK
       - name: Create Release
