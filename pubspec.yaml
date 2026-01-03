@@ -1,5 +1,5 @@
 name: EuroCalculator
-description: Лесен калулатор с който да превръщаш лева в евро за всекидневните ти сметки и разплащания.
+description: Piggy Calc - Лесен калулатор с който да превръщаш лева в евро за всекидневните ти сметки и разплащания.
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -27,7 +27,10 @@ flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/icon/app_icon.png"
-  adaptive_icon_background: "#1A237E"
+  web:
+    generate: true
+    image_path: "assets/icon/app_icon.png"
+  adaptive_icon_background: "#0D0D0D" # Your dark background
   adaptive_icon_foreground: "assets/icon/app_icon.png"
 
 flutter:
