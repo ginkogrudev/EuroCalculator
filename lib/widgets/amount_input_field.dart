@@ -1,7 +1,6 @@
-// lib/widgets/amount_input_field.dart
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../core/app_theme.dart';
 import '../providers/app_state_provider.dart';
 import '../core/haptic_service.dart'; // Ensure this matches your file path
 

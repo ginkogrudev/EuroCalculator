@@ -1,5 +1,3 @@
-// lib/widgets/action_footer.dart
-import 'package:EuroCalculator/core/app_theme.dart';
 import 'package:EuroCalculator/core/haptic_service.dart';
 import 'package:flutter/material.dart';
 import '../providers/app_state_provider.dart';

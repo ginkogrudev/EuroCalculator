@@ -1,0 +1,51 @@
+name: Piggy Calc LaunchPad
+on:
+  push:
+    branches: [main] # Only runs when you push to main
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Important: Gives the bot permission to update gh-pages
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - run: flutter pub get
+
+      # 1. Run your UI and Logic Tests
+      - name: Run Tests
+        run: flutter test
+
+      # 2. Build Android APK (Downloadable from Actions tab)
+      - name: Build Android APK
+        run: flutter build apk --release
+
+      # 3. Build Web Version
+      - name: Build Web
+        run: flutter build web --release --base-href "/euro-calculator-demo/"
+
+      # 4. Deploy to gh-pages branch (Nukes the 5000 files and replaces with clean build)
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web
+
+      # 5. Save APK as an "Artifact" so you can download it to your phone
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: piggy-calc-android-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
