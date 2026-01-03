@@ -60,7 +60,7 @@ class SettingsScreen extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
-            tileColor: Colors.white.withOpacity(0.03),
+            tileColor: Colors.white.withValues(alpha: 0.03),
           ),
 
           const SizedBox(height: 12),

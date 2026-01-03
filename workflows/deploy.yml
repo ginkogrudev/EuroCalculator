@@ -1,13 +1,13 @@
 name: Piggy Calc LaunchPad
 on:
   push:
-    branches: [main] # Only runs when you push to main
+    branches: [main]
 
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Important: Gives the bot permission to update gh-pages
+      contents: write # Essential for both GH Pages and Releases
     steps:
       - uses: actions/checkout@v4
 
@@ -24,26 +24,39 @@ jobs:
 
       - run: flutter pub get
 
-      # 1. Run your UI and Logic Tests
       - name: Run Tests
         run: flutter test
 
-      # 2. Build Android APK (Downloadable from Actions tab)
       - name: Build Android APK
         run: flutter build apk --release
 
-      # 3. Build Web Version
       - name: Build Web
         run: flutter build web --release --base-href "/EuroCalculator/"
 
-      # 4. Deploy to gh-pages branch (Nukes the 5000 files and replaces with clean build)
+      # 4. Deploy Web to gh-pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web
+          publish_branch: gh-pages
 
-      # 5. Save APK as an "Artifact" so you can download it to your phone
+      # 5. NEW: Create GitHub Release and Upload APK
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Piggy Calc Release v1.0.${{ github.run_number }}
+          files: build/app/outputs/flutter-apk/app-release.apk
+          body: |
+            ## Euro Piggy Update 🐷
+            - Нова версия с опреснен дизайн и лого!
+            - Подобрена поддръжка за споделяне на теми.
+            - Тествано и готово за работа.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 6. Keep Artifact as backup
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:

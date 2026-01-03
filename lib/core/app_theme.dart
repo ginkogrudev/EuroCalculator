@@ -24,7 +24,7 @@ class AppTheme {
       // This fixes the "TextField yellow line" and blue defaults
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: accent,
-        selectionColor: accent.withOpacity(0.3),
+        selectionColor: accent.withValues(alpha: 0.3),
       ),
     );
   }

@@ -16,9 +16,9 @@ class ThemeShareCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: state.accentColor.withOpacity(0.2)),
+        border: Border.all(color: state.accentColor.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
@@ -33,11 +33,23 @@ class ThemeShareCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           ElevatedButton.icon(
-            onPressed: () {
+            onPressed: () async {
               HapticService.success();
-              Share.share(
-                "Виж моята тема за Euro Piggy! Код: $code \nСвали приложението тук: https://your-landing-page.com",
-                subject: "Euro Piggy Theme",
+
+              // 2026 Modern Syntax: Using SharePlus.instance and ShareParams
+              // Note: sharePositionOrigin is mandatory on iPads to avoid crashes
+              final box = context.findRenderObject() as RenderBox?;
+              final rect = box != null
+                  ? box.localToGlobal(Offset.zero) & box.size
+                  : null;
+
+              await SharePlus.instance.share(
+                ShareParams(
+                  text:
+                      "Виж моята тема за Euro Piggy! Код: $code \nСвали приложението тук: https://github.com/ginkogrudev/EuroCalculator/releases/latest",
+                  subject: "Euro Piggy Theme",
+                  sharePositionOrigin: rect,
+                ),
               );
             },
             icon: const Icon(Icons.ios_share_rounded, size: 18),
@@ -50,6 +62,7 @@ class ThemeShareCard extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
           ),
         ],

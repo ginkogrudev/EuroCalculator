@@ -53,7 +53,7 @@ class HomeView extends StatelessWidget {
                               "РЕСТО: ${state.changeInLev.toStringAsFixed(2)} лв",
                               style: TextStyle(
                                 color: (isDark ? Colors.white : Colors.black)
-                                    .withOpacity(0.5),
+                                    .withValues(alpha: .5),
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -120,7 +120,7 @@ class HomeView extends StatelessWidget {
                     ? "ЛИЧЕН ПРОФИЛ"
                     : "БИЗНЕС",
                 style: TextStyle(
-                  color: accent.withOpacity(0.5),
+                  color: accent.withValues(alpha: .5),
                   fontSize: 10,
                   fontWeight: FontWeight.w900,
                 ),

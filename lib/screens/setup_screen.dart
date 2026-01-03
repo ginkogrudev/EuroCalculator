@@ -189,7 +189,7 @@ class _SetupScreenState extends State<SetupScreen> {
           duration: const Duration(milliseconds: 250),
           padding: const EdgeInsets.symmetric(vertical: 18),
           decoration: BoxDecoration(
-            color: isSelected ? accent : Colors.white.withOpacity(0.05),
+            color: isSelected ? accent : Colors.white.withValues(alpha: .05),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: isSelected ? accent : Colors.transparent),
           ),
