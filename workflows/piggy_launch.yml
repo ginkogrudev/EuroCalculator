@@ -1,4 +1,4 @@
-name: Piggy Calc LaunchPad
+name: Final Piggy Deploy 
 on:
   push:
     branches: [main]
