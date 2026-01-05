@@ -5,9 +5,8 @@ import '../screens/settings_screen.dart';
 
 class ActionFooter extends StatelessWidget {
   final AppStateProvider state;
-  final bool isDark;
 
-  const ActionFooter({super.key, required this.state, required this.isDark});
+  const ActionFooter({super.key, required this.state});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +30,7 @@ class ActionFooter extends StatelessWidget {
                 },
                 icon: Icon(
                   Icons.settings_outlined,
-                  color: isDark ? Colors.white30 : Colors.black26,
+                  color: accent
                 ),
               ),
               const SizedBox(width: 12),

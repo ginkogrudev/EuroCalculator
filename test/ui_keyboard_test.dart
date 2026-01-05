@@ -10,7 +10,6 @@ void main() {
   ) async {
     // 1. Setup the state
     final appState = AppStateProvider();
-    appState.init(); // Ensure provider is ready
 
     await tester.pumpWidget(
       ChangeNotifierProvider.value(

@@ -19,12 +19,12 @@ class SocialLinksCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "ВРЪЗКИ",
           style: TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.w900,
-            color: Colors.white38,
+            color: state.textColor.withValues(alpha: 0.38), // REACTIVE
             letterSpacing: 2,
           ),
         ),
@@ -60,7 +60,7 @@ class SocialLinksCard extends StatelessWidget {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.03),
+        color: state.textColor.withValues(alpha: 0.03), // REACTIVE BG
         borderRadius: BorderRadius.circular(16),
       ),
       child: ListTile(
@@ -75,8 +75,8 @@ class SocialLinksCard extends StatelessWidget {
         ),
         title: Text(
           title,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: state.textColor, // REACTIVE TITLE
             fontWeight: FontWeight.w900,
             fontSize: 14,
             letterSpacing: 0.5,
@@ -85,13 +85,13 @@ class SocialLinksCard extends StatelessWidget {
         subtitle: Text(
           subtitle,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.4),
+            color: state.textColor.withValues(alpha: 0.4), // REACTIVE SUBTITLE
             fontSize: 11,
           ),
         ),
         trailing: Icon(
           Icons.arrow_forward_ios,
-          color: Colors.white10,
+          color: state.textColor.withValues(alpha: 0.1), // REACTIVE ARROW
           size: 14,
         ),
       ),

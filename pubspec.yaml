@@ -12,30 +12,27 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   shared_preferences: ^2.5.4
-  provider: ^6.1.5+1   # Make sure this is here
+  provider: ^6.1.5+1
   url_launcher: ^6.3.0
   share_plus: ^12.0.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^6.0.0
+  flutter_lints: ^3.0.0
   flutter_launcher_icons: ^0.14.4
 
-# This section must stay at the very edge (no spaces before it)
 flutter_launcher_icons:
-  android: "launcher_icon"
+  android: true
   ios: true
   image_path: "assets/icon/app_icon.png"
   web:
     generate: true
     image_path: "assets/icon/app_icon.png"
-  adaptive_icon_background: "#0D0D0D" # Your dark background
+  adaptive_icon_background: "#0D0D0D"
   adaptive_icon_foreground: "assets/icon/app_icon.png"
 
 flutter:
   uses-material-design: true
-  
-  # Ensure your icon folder is listed here so Flutter can find the image!
   assets:
     - assets/icon/

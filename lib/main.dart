@@ -6,15 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
-  // 1. Mandatory for SharedPreferences and any native plugins
+  // 1. Essential for native plugin initialization (SharedPreferences)
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 2. Instantiate the Provider immediately
+  // 2. Instantiate provider (Constructor triggers _initEngine automatically)
   final appState = AppStateProvider();
-
-  // 3. Kick off the Disk Read (init)
-  // We don't 'await' here because the UI handles the loading state via isReady
-  appState.init();
 
   runApp(
     ChangeNotifierProvider.value(
@@ -29,35 +25,31 @@ class EuroCalculatorApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppStateProvider>(
-      builder: (context, state, child) {
-        // 1. Check if the Provider has finished reading from Disk (Async check)
-        if (!state.isReady) {
-          return const MaterialApp(
-            debugShowCheckedModeBanner: false,
-            home: Scaffold(
-              backgroundColor: Color(0xFF000000), // Match your dark background
-              body: Center(
-                child: CircularProgressIndicator(color: Color(0xFFFF2D55)),
-              ),
-            ),
-          );
-        }
+    // We watch the provider so the entire App rebuilds when theme colors change
+    final state = context.watch<AppStateProvider>();
 
-        // 2. Once ready, build the real app
-        return MaterialApp(
-          theme: AppTheme.buildTheme(
-            accent: state.accentColor,
-            background: state.bgColor,
-          ),
-          debugShowCheckedModeBanner: false,
-          title: 'Piggy Calculator',
-          // THE GATEKEEPER
-          // setupComplete = User has a name saved
-          // !setupComplete = Show SetupScreen (even after a Hard Reset)
-          home: state.setupComplete ? const HomeView() : const SetupScreen(),
-        );
-      },
+    // We build the MaterialApp ONCE.
+    // This keeps the engine warm and prevents the "Double Loading" flicker.
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Piggy Calculator',
+
+      // Pass your dynamic colors into the global theme
+      theme: AppTheme.buildTheme(
+        accent: state.accentColor,
+        background: state.bgColor,
+        // textColor: state.textColor, // Enable this if your AppTheme supports it
+      ),
+
+      // THE GATEKEEPER LOGIC
+      // If state isn't ready, show a blank scaffold that matches the native splash.
+      // Once ready, it instantly swaps the 'home' widget without rebuilding the MaterialApp.
+      home: !state.isReady
+          ? const Scaffold(
+              backgroundColor: Color(0xFF0D0D0D), // Piggy Dark Background
+              body: SizedBox.expand(),
+            )
+          : (state.setupComplete ? const HomeView() : const SetupScreen()),
     );
   }
 }

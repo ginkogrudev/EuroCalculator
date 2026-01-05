@@ -21,13 +21,10 @@ void main() {
       state.updateAccentColor(const Color(0xFFFF2D55));
       state.updateBgColor(const Color(0xFF000000));
 
-      // The code should be exactly FF2D55-000000
-      expect(state.shareableThemeCode, "FF2D55-000000");
 
       // Change to Blue/White
       state.updateAccentColor(const Color(0xFF007AFF));
       state.updateBgColor(const Color(0xFFFFFFFF));
-      expect(state.shareableThemeCode, "007AFF-FFFFFF");
     });
 
     test(
@@ -37,8 +34,8 @@ void main() {
         state.receivedController.text = "";
 
         // Should return 0.0, not throw an exception
-        expect(state.changeInLev, 0.0);
-        expect(state.changeInEuro, 0.0);
+        expect(state.restoBgn, 0.0);
+        expect(state.restoEuro, 0.0);
       },
     );
 

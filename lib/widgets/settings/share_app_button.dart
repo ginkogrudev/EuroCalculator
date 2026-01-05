@@ -17,8 +17,6 @@ class ShareAppButton extends StatelessWidget {
       child: InkWell(
         onTap: () {
           HapticService.heavy();
-
-          // Use the .instance property to access the methods
           SharePlus.instance.share(
             ShareParams(
               text:
@@ -32,25 +30,34 @@ class ShareAppButton extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 20),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.white10),
+            border: Border.all(
+              color: state.textColor.withValues(alpha: 0.1),
+            ), // REACTIVE BORDER
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
             children: [
               Icon(Icons.stars_rounded, color: state.accentColor),
               const SizedBox(height: 8),
-              const Text(
-                "СПОЕДЕЛИ ПРИЛОЖЕНИЕТО С ПРИЯТЕЛ ИЛИ ВРАГ ",
+              Text(
+                "СПОЕДЕЛИ ПРИЛОЖЕНИЕТО С ПРИЯТЕЛ ИЛИ ВРАГ",
                 style: TextStyle(
-                  color: Colors.white70,
+                  color: state.textColor.withValues(
+                    alpha: 0.7,
+                  ), // REACTIVE PRIMARY
                   fontWeight: FontWeight.w900,
                   fontSize: 11,
                   letterSpacing: 1.1,
                 ),
               ),
-              const Text(
+              Text(
                 "Помогни на прасенцето да порасне",
-                style: TextStyle(color: Colors.white24, fontSize: 10),
+                style: TextStyle(
+                  color: state.textColor.withValues(
+                    alpha: 0.24,
+                  ), // REACTIVE SECONDARY
+                  fontSize: 10,
+                ),
               ),
             ],
           ),

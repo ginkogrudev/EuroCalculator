@@ -5,10 +5,8 @@ import 'package:provider/provider.dart';
 import '../providers/app_state_provider.dart';
 import '../widgets/settings/identity_card.dart';
 import '../widgets/settings/social_links_card.dart';
-import '../widgets/settings/theme_code_importer.dart';
 import '../widgets/settings/color_picker_sheet.dart';
-import '../widgets/settings/theme_share_card.dart'; // New
-import '../widgets/settings/share_app_button.dart'; // New
+import '../widgets/settings/share_app_button.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -18,11 +16,12 @@ class SettingsScreen extends StatelessWidget {
     final state = context.watch<AppStateProvider>();
 
     return Scaffold(
-      backgroundColor: state.bgColor, // Reactive background
+      backgroundColor: state.bgColor,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           "ПРОФИЛ И ДИЗАЙН",
           style: TextStyle(
+            color: state.textColor, // FIXED: Reactive title
             fontWeight: FontWeight.w900,
             fontSize: 14,
             letterSpacing: 2,
@@ -31,7 +30,6 @@ class SettingsScreen extends StatelessWidget {
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        // Ensure back button matches theme
         iconTheme: IconThemeData(color: state.accentColor),
       ),
       body: ListView(
@@ -40,45 +38,41 @@ class SettingsScreen extends StatelessWidget {
           const IdentityCard(),
           const SizedBox(height: 40),
 
-          _buildHeader("ПЕРСОНАЛИЗАЦИЯ"),
+          _buildHeader("ПЕРСОНАЛИЗАЦИЯ", state.textColor),
           const SizedBox(height: 16),
 
-          // THE DUAL COLOR PICKER TRIGGER
           ListTile(
             onTap: () => showPiggyColorPicker(context, state),
             contentPadding: const EdgeInsets.symmetric(horizontal: 12),
             leading: Icon(Icons.palette_rounded, color: state.accentColor),
-            title: const Text(
+            title: Text(
               "ИЗБЕРИ ЦВЕТОВЕ",
               style: TextStyle(
-                color: Colors.white,
+                color: state.textColor, // FIXED: Reactive text
                 fontWeight: FontWeight.bold,
                 fontSize: 13,
               ),
             ),
-            trailing: const Icon(Icons.chevron_right, color: Colors.white24),
+            trailing: Icon(
+              Icons.chevron_right,
+              color: state.textColor.withValues(alpha: 0.2),
+            ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
-            tileColor: Colors.white.withValues(alpha: 0.03),
+            tileColor: state.textColor.withValues(alpha: 0.03),
           ),
 
-          const SizedBox(height: 12),
-          const ThemeCodeImporter(),
-          const SizedBox(height: 12),
-          const ThemeShareCard(), // Users can now export their look
-
           const SizedBox(height: 40),
-          _buildHeader("ВРЪЗКА С НАС"),
+          _buildHeader("ВРЪЗКА С НАС", state.textColor),
           const SocialLinksCard(),
-
-          const ShareAppButton(), // The "Piggy Movement" button
+          const ShareAppButton(),
 
           const SizedBox(height: 40),
 
-          // lib/screens/settings_screen.dart
+          // EMERGENCY RESET BUTTON
           TextButton.icon(
-            key: const Key('hard_reset_button'), 
+            key: const Key('hard_reset_button'),
             onPressed: () => _confirmReset(context, state),
             icon: const Icon(
               Icons.delete_forever_rounded,
@@ -100,13 +94,13 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(String text) {
+  Widget _buildHeader(String text, Color textColor) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 10,
         fontWeight: FontWeight.w900,
-        color: Colors.white38,
+        color: textColor.withValues(alpha: 0.4), // FIXED: Reactive header
         letterSpacing: 2,
       ),
     );
@@ -116,24 +110,32 @@ class SettingsScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (innerContext) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: state.bgColor.withValues(
+          alpha: 0.95,
+        ), // FIXED: Dialog matches theme
+        surfaceTintColor: state.accentColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Text(
+        title: Text(
           "НУЛИРАНЕ?",
           style: TextStyle(
-            color: Colors.white,
+            color: state.textColor, // FIXED
             fontWeight: FontWeight.w900,
             fontSize: 16,
           ),
         ),
-        content: const Text(
+        content: Text(
           "Това ще изтрие името и персонализираните ви цветове.",
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(
+            color: state.textColor.withValues(alpha: 0.7),
+          ), // FIXED
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(innerContext),
-            child: const Text("ОТКАЗ", style: TextStyle(color: Colors.white24)),
+            child: Text(
+              "ОТКАЗ",
+              style: TextStyle(color: state.textColor.withValues(alpha: 0.3)),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(

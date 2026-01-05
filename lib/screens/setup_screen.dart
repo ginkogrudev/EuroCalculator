@@ -143,23 +143,15 @@ class _SetupScreenState extends State<SetupScreen> {
                   onPressed: () {
                     final name = _controller.text.trim();
                     if (name.isNotEmpty) {
-                      HapticService.success();
+                      // No need to call HapticService here, completeSetup does it for us!
 
-                      // 1. Save state
-                      state.updateDisplayName(name);
-                      // If you have a setAccountType method:
-                      // state.setAccountType(_isBusiness ? AccountType.business : AccountType.personal);
+                      // Pass the actual _isBusiness state variable to the provider
+                      state.completeSetup(name, _isBusiness);
 
-                      // 2. Mark setup as complete in Provider/Prefs
-                      state.completeSetup(name, false);
-
-                      // 3. Navigate to Home and clear stack
                       Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(builder: (_) => const HomeView()),
                         (route) => false,
                       );
-                    } else {
-                      HapticService.light(); // Provide feedback that input is required
                     }
                   },
                   child: const Text(

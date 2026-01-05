@@ -1,6 +1,8 @@
-// lib/widgets/settings/color_picker_sheet.dart
+import 'package:EuroCalculator/core/haptic_service.dart';
 import 'package:EuroCalculator/providers/app_state_provider.dart';
 import 'package:flutter/material.dart';
+
+enum PickerType { accent, background, text }
 
 void showPiggyColorPicker(BuildContext context, AppStateProvider state) {
   showModalBottomSheet(
@@ -10,47 +12,97 @@ void showPiggyColorPicker(BuildContext context, AppStateProvider state) {
       borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
     ),
     builder: (context) {
-      return StatefulBuilder(
-        // Use StatefulBuilder for immediate UI feedback in the sheet
-        builder: (context, setSheetState) {
-          return Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.white12,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // SECTION 1: ACCENT COLORS
-                _pickerLabel("ЦВЯТ НА АКЦЕНТА", state.accentColor),
-                const SizedBox(height: 16),
-                _buildColorRow(state, isAccent: true),
-
-                const SizedBox(height: 32),
-
-                // SECTION 2: BACKGROUND COLORS
-                _pickerLabel("ЦВЯТ НА ФОНА", Colors.white38),
-                const SizedBox(height: 16),
-                _buildColorRow(state, isAccent: false),
-
-                const SizedBox(height: 30),
-
-                // LIVE CODE BOX
-                _buildCodePreview(state),
-                const SizedBox(height: 20),
-              ],
+      return Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: state.textColor,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          );
-        },
+            const SizedBox(height: 20),
+
+            _pickerLabel("ЦВЯТ НА АКЦЕНТА", state.accentColor),
+            const SizedBox(height: 12),
+            _buildColorRow(state, PickerType.accent),
+
+            const SizedBox(height: 24),
+
+            _pickerLabel("ЦВЯТ НА ФОНА", state.textColor),
+            const SizedBox(height: 12),
+            _buildColorRow(state, PickerType.background),
+
+            const SizedBox(height: 24),
+
+            _pickerLabel("ЦВЯТ НА ТЕКСТА", state.textColor),
+            const SizedBox(height: 12),
+            _buildColorRow(state, PickerType.text),
+
+            const SizedBox(height: 20),
+            const SizedBox(height: 24),
+            OutlinedButton(
+              onPressed: () {
+                state.resetTheme();
+                HapticService.heavy(); // Feedback that a big change happened
+              },
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: state.textColor.withValues(alpha: 0.1)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                "ВЪРНИ СТАНДАРТНИТЕ ЦВЕТОВЕ",
+                style: TextStyle(
+                  color: state.textColor.withValues(alpha: 0.5),
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
       );
     },
+  );
+}
+
+Widget _buildColorRow(AppStateProvider state, PickerType type) {
+  final List<Color> options;
+  if (type == PickerType.accent) {
+    options = [
+      const Color(0xFFFF2D55),
+      const Color(0xFF007AFF),
+      const Color(0xFF5856D6),
+      const Color(0xFF32D74B),
+      const Color(0xFFFF9500),
+    ];
+  } else if (type == PickerType.background) {
+    options = [
+      const Color(0xFF000000),
+      const Color(0xFF1A1A1A),
+      const Color(0xFF0D1117),
+      const Color(0xFFFFFFFF),
+      const Color(0xFFF2F2F7),
+    ];
+  } else {
+    options = [
+      Colors.white,
+      Colors.black,
+      const Color(0xFFFFD1DC),
+      const Color(0xFF8E8E93),
+    ];
+  }
+
+  return Wrap(
+    spacing: 12,
+    children: options.map((color) => _colorBubble(state, color, type)).toList(),
   );
 }
 
@@ -66,42 +118,33 @@ Widget _pickerLabel(String text, Color color) {
   );
 }
 
-Widget _buildColorRow(AppStateProvider state, {required bool isAccent}) {
-  final List<Color> accentOptions = [
-    const Color(0xFFFF2D55), // Piggy Pink
-    const Color(0xFF007AFF), // Electric Blue
-    const Color(0xFF5856D6), // Royal Purple
-    const Color(0xFF32D74B), // Cash Green
-    const Color(0xFFFF9500), // Gold
-  ];
-
-  final List<Color> bgOptions = [
-    const Color(0xFF000000), // Pure Black
-    const Color(0xFF1A1A1A), // Soft Dark
-    const Color(0xFF0D1117), // Deep Navy
-    const Color(0xFFFFFFFF), // Clean White
-    const Color(0xFFF2F2F7), // iOS Light Grey
-  ];
-
-  return Wrap(
-    spacing: 12,
-    children: (isAccent ? accentOptions : bgOptions).map((color) {
-      return _colorBubble(state, color, isAccent);
-    }).toList(),
-  );
-}
-
-Widget _colorBubble(AppStateProvider state, Color color, bool isAccent) {
-  bool isSelected = isAccent
-      ? state.accentColor.toARGB32() == color.toARGB32
-      : state.bgColor.toARGB32 == color.toARGB32;
+Widget _colorBubble(AppStateProvider state, Color color, PickerType type) {
+  bool isSelected;
+  switch (type) {
+    case PickerType.accent:
+      isSelected = state.accentColor.toARGB32() == color.toARGB32();
+      break;
+    case PickerType.background:
+      isSelected = state.bgColor.toARGB32() == color.toARGB32();
+      break;
+    case PickerType.text:
+      isSelected = state.textColor.toARGB32() == color.toARGB32();
+      break;
+  }
 
   return GestureDetector(
     onTap: () {
-      if (isAccent) {
+      if (type == PickerType.accent) {
+        HapticService.light();
         state.updateAccentColor(color);
-      } else {
+      }
+      if (type == PickerType.background) {
+        HapticService.light();
         state.updateBgColor(color);
+      }
+      if (type == PickerType.text) {
+        HapticService.light();
+        state.updateTextColor(color);
       }
     },
     child: AnimatedContainer(
@@ -112,9 +155,7 @@ Widget _colorBubble(AppStateProvider state, Color color, bool isAccent) {
         color: color,
         shape: BoxShape.circle,
         border: Border.all(
-          color: isSelected
-              ? (color.computeLuminance() > 0.5 ? Colors.black : Colors.white)
-              : Colors.white10,
+          color: isSelected ? state.accentColor : Colors.white10,
           width: isSelected ? 3 : 1,
         ),
       ),
@@ -127,33 +168,6 @@ Widget _colorBubble(AppStateProvider state, Color color, bool isAccent) {
                   : Colors.white,
             )
           : null,
-    ),
-  );
-}
-
-Widget _buildCodePreview(AppStateProvider state) {
-  return Container(
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: Colors.white.withValues(alpha: 50),
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const Text(
-          "ВАШИЯТ КОД:",
-          style: TextStyle(color: Colors.white38, fontSize: 10),
-        ),
-        SelectableText(
-          state.shareableThemeCode,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'monospace',
-          ),
-        ),
-      ],
     ),
   );
 }

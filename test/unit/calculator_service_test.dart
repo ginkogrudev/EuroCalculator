@@ -1,83 +1,97 @@
-// test/unit/calculator_service_test.dart
 import 'package:flutter_test/flutter_test.dart';
 import 'package:EuroCalculator/services/calculator_service.dart';
 
 void main() {
   final calculator = CalculatorService();
+  const double eurRate = 1.95583; // Tracking the core constant
 
-  group('Cross-Currency Logic Tests', () {
-    test('Scenario: BGN Bill (20.00) paid with EUR (10.00)', () {
-      // 10 EUR at 1.95583 = 19.5583 BGN.
-      // Result should be 0 because 19.55 < 20.00 (Insufficient funds)
+  group('Core Currency Conversion Logic', () {
+    test('Identical values in different currencies (Exact Rate Check)', () {
+      // 100 EUR vs 195.583 BGN should result in 0.00 change
       final change = calculator.calculateChangeBgn(
-        billAmount: 20.0,
+        billAmount: 100.0 * eurRate,
         billInEuro: false,
-        receivedAmount: 10.0,
-        receivedInEuro: true,
-      );
-      expect(change, 0.0);
-    });
-
-    test('Scenario: BGN Bill (10.00) paid with EUR (10.00)', () {
-      // 10 EUR = 19.5583 BGN. Change = 19.5583 - 10.00 = 9.5583
-      final change = calculator.calculateChangeBgn(
-        billAmount: 10.0,
-        billInEuro: false,
-        receivedAmount: 10.0,
-        receivedInEuro: true,
-      );
-      expect(change, closeTo(9.5583, 0.0001));
-    });
-
-    test('Scenario: EUR Bill paid with EUR (Pure Euro Mode)', () {
-      // 50.00 EUR bill paid with 100.00 EUR
-      // Change should be 50 EUR * 1.95583 = 97.7915 BGN
-      final change = calculator.calculateChangeBgn(
-        billAmount: 50.0,
-        billInEuro: true,
         receivedAmount: 100.0,
         receivedInEuro: true,
       );
-      expect(change, closeTo(97.7915, 0.0001));
-    });
-  });
-
-  group('Edge Case Math & Precision', () {
-    test('Handle Zero & Negative Inputs Gracefully', () {
-      final change = calculator.calculateChangeBgn(
-        billAmount: -50.0,
-        billInEuro: false,
-        receivedAmount: 0.0,
-        receivedInEuro: false,
-      );
-      expect(change, 0.0);
-    });
-
-    test('Precision Test: Floating point rounding (The 0.01 bug)', () {
-      // 1 EUR = 1.95583 BGN.
-      final change = calculator.calculateChangeBgn(
-        billAmount: 1.00,
-        billInEuro: true,
-        receivedAmount: 1.96,
-        receivedInEuro: false,
-      );
-
-      // Real change is 0.00417.
-      // In currency, this is effectively zero because it's less than half a stotinka.
       expect(calculator.formatCurrency(change), "0.00");
     });
 
-    test('Precision Test: 100 EUR exact check', () {
-      // 100 EUR is exactly 195.583 BGN
-      final changeBgn = calculator.calculateChangeBgn(
-        billAmount: 0.0,
+    test('BGN Bill paid with EUR (The most common tourist case)', () {
+      // 50 BGN bill paid with 30 EUR (30 * 1.95583 = 58.6749)
+      // Change: 58.6749 - 50.00 = 8.6749
+      final change = calculator.calculateChangeBgn(
+        billAmount: 50.0,
         billInEuro: false,
-        receivedAmount: 100.0,
+        receivedAmount: 30.0,
         receivedInEuro: true,
       );
+      expect(calculator.formatCurrency(change), "8.67");
+    });
 
-      // Should format to 195.58 BGN (standard Bulgarian bank rounding/truncation)
-      expect(calculator.formatCurrency(changeBgn), "195.58");
+    test('EUR Bill paid with BGN (The business case)', () {
+      // 20 EUR bill (39.1166 BGN) paid with 50 BGN
+      // Change: 50.00 - 39.1166 = 10.8834
+      final change = calculator.calculateChangeBgn(
+        billAmount: 20.0,
+        billInEuro: true,
+        receivedAmount: 50.0,
+        receivedInEuro: false,
+      );
+      expect(calculator.formatCurrency(change), "10.88");
+    });
+  });
+
+  group('Safety & Error Handling', () {
+    test('Received amount exactly equals bill (No change)', () {
+      final change = calculator.calculateChangeBgn(
+        billAmount: 125.50,
+        billInEuro: false,
+        receivedAmount: 125.50,
+        receivedInEuro: false,
+      );
+      expect(change, 0.0);
+    });
+
+    test('Insufficient funds should ALWAYS return 0.0', () {
+      final change = calculator.calculateChangeBgn(
+        billAmount: 1000.0,
+        billInEuro: false,
+        receivedAmount: 10.0,
+        receivedInEuro: false,
+      );
+      expect(change, 0.0);
+    });
+
+    test('Handles extremely large numbers (Store stress test)', () {
+      final change = calculator.calculateChangeBgn(
+        billAmount: 999999.99,
+        billInEuro: false,
+        receivedAmount: 2000000.00,
+        receivedInEuro: false,
+      );
+      expect(change, 1000000.01);
+    });
+  });
+
+  group('Rounding & Precision (Stotinka Safety)', () {
+    test('Very small difference (Micro-change check)', () {
+      // 10.00 BGN paid with 10.004 BGN should not show 0.01
+      final change = calculator.calculateChangeBgn(
+        billAmount: 10.00,
+        billInEuro: false,
+        receivedAmount: 10.004,
+        receivedInEuro: false,
+      );
+      expect(calculator.formatCurrency(change), "0.00");
+    });
+
+    test('Conversion rounding alignment', () {
+      // 1.95 BGN converted to Euro should be 0.997... formatted to 1.00 or 0.99
+      final bgnChange = 1.95;
+      final eurChange = calculator.convertToEur(bgnChange);
+      // 1.95 / 1.95583 = 0.9970
+      expect(eurChange.toStringAsFixed(2), "1.00");
     });
   });
 }

@@ -2,13 +2,13 @@ name: Final Piggy Deploy
 on:
   push:
     branches: [main]
-  workflow_dispatch: # Allows you to run it manually from the Actions tab
+  workflow_dispatch: 
 
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Allows creating releases and updating gh-pages
+      contents: write 
       packages: write
     steps:
       - uses: actions/checkout@v4
@@ -27,43 +27,53 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      # 1. GENERATE ICONS (This fixes the "missing logo" on phones)
+      - name: Generate Launcher Icons
+        run: dart run flutter_launcher_icons
+
       - name: Run Tests
         run: flutter test
 
+      # 2. BUILD ANDROID
       - name: Build Android APK
         run: flutter build apk --release
 
+      # 3. RENAME APK (For professional branding)
+      - name: Rename APK
+        run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/PiggyCalculator.apk
+
+      # 4. BUILD WEB
       - name: Build Web
         run: flutter build web --release --base-href "/EuroCalculator/"
 
-      # 4. Deploy Web to gh-pages
-      # This step will now CLEAN the branch and only put index.html/js files there
+      # 5. DEPLOY WEB TO GH-PAGES
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web
           publish_branch: gh-pages
-          force_orphan: true # This forces the branch to match the build folder exactly
+          force_orphan: true
 
-      # 5. Create GitHub Release and Upload APK
+      # 6. CREATE RELEASE & UPLOAD RENAMED APK
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v1.0.${{ github.run_number }}
-          name: Piggy Calc Release v1.0.${{ github.run_number }}
-          files: build/app/outputs/flutter-apk/app-release.apk
+          name: Piggy Calc v1.0.${{ github.run_number }}
+          files: build/app/outputs/flutter-apk/PiggyCalculator.apk
           body: |
             ## Euro Piggy Update 🐷
-            - Нова версия с опреснен дизайн и лого!
-            - Подобрена поддръжка за споделяне на теми.
-            - Тествано и готово за работа.
+            - ✨ Официално лого и икона на приложението.
+            - 📱 Име на файла: PiggyCalculator.apk.
+            - 🛠️ Подобрена поддръжка за бизнес и лични профили.
+            - ✅ Всички тестове преминати успешно.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 6. Keep Artifact as backup
+      # 7. BACKUP ARTIFACT
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: piggy-calc-android-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: piggy-calc-final-apk
+          path: build/app/outputs/flutter-apk/PiggyCalculator.apk

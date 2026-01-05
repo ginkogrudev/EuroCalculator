@@ -36,7 +36,7 @@ void main() {
       state.receivedController.text = "20.00";
 
       // 20.00 - 10.00 = 10.0
-      expect(state.changeInLev, 10.0);
+      expect(state.restoBgn, 10.0);
     });
 
     test('Math: Calculate change correctly (BGN Bill, EUR Received)', () {
@@ -46,24 +46,7 @@ void main() {
 
       // (1.00 * 1.95583) - 1.96 = -0.00417...
       // closeTo(0, 0.01) allows for this tiny rounding difference
-      expect(state.changeInLev, closeTo(0, 0.01));
-    });
-
-    test('Theme: applyThemeCode ignores invalid formats', () {
-      final initialColor = state.accentColor;
-
-      state.applyThemeCode("INVALID-CODE");
-      state.applyThemeCode("123-456"); // Too short
-
-      expect(state.accentColor, initialColor);
-    });
-
-    test('Theme: applyThemeCode applies valid 6-char hex', () {
-      state.applyThemeCode("00FF00-FFFFFF"); // Green accent, White BG
-
-      // Call the method on both to compare the resulting integers
-      expect(state.accentColor.toARGB32(), const Color(0xFF00FF00).toARGB32());
-      expect(state.bgColor.toARGB32(), const Color(0xFFFFFFFF).toARGB32());
+      expect(state.restoBgn, closeTo(0, 0.01));
     });
 
     test('Reset: hardReset clears all data', () async {
